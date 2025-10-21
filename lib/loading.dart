@@ -1,7 +1,7 @@
 import 'package:flowfin/api/auth.dart';
 import 'package:flowfin/api/models/user.dart';
 import 'package:flowfin/screens/auth/login.dart';
-import 'package:flowfin/screens/home.dart';
+import 'package:flowfin/screens/tab_bar.dart';
 import 'package:flowfin/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -59,8 +59,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundColor = const Color(0xFFf2e2e3);
+    final accentColor = const Color(0xFFa188a6);
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: backgroundColor,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,
         child: Column(
@@ -69,7 +71,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
           children: [
             CircularProgressIndicator(
               strokeWidth: 8,
-              color: Color(0xFF6A11CB),
+              color: accentColor,
               strokeCap: StrokeCap.round,
             ),
           ],

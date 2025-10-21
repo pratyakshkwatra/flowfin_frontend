@@ -1,10 +1,10 @@
-import 'package:flowfin/api/exceptions.dart';
-import 'package:flowfin/api/models/user.dart';
-import 'package:flowfin/screens/auth/create_account.dart';
-import 'package:flowfin/screens/home.dart';
-import 'package:flowfin/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flowfin/screens/auth/create_account.dart';
+import 'package:flowfin/screens/tab_bar.dart';
+import 'package:flowfin/services/auth.dart';
+import 'package:flowfin/api/models/user.dart';
+import 'package:flowfin/api/exceptions.dart';
 
 class LoginScreen extends StatefulWidget {
   final AuthService authService;
@@ -46,16 +46,14 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       User? user = await widget.authService.login(_email.text, _password.text);
-      if (mounted) {
-        if (user != null) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  HomeScreen(authService: widget.authService, user: user),
-            ),
-          );
-        }
+      if (mounted && user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                HomeScreen(authService: widget.authService, user: user),
+          ),
+        );
       }
     } on APIException catch (e) {
       _showError("${e.code}: ${e.message}");
@@ -68,95 +66,106 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = Colors.deepPurple.shade300;
+    final LinearGradient backgroundGradient = const LinearGradient(
+      colors: [
+        Color(0xFFFDF6F9),
+        Color(0xFFEAE1ED),
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
 
-    final backgroundColor = const Color(0xFFF8F9FA);
-    final primaryTextColor = const Color(0xFF212529);
-    final secondaryTextColor = Colors.grey.shade600;
+    const Color accentColor = Color(0xFF8057A1);
+    const Color primaryTextColor = Color(0xFF1B1B1E);
+    const Color secondaryTextColor = Color(0xFF6E6E6E);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Icon(Icons.business_center_outlined, size: 64, color: primaryTextColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Welcome Back',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: primaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Login to manage your business finances',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: secondaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  _StyledInputField(
-                    controller: _email,
-                    hintText: 'Email',
-                    icon: Icons.alternate_email,
-                    accentColor: accentColor,
-                  ),
-                  const SizedBox(height: 16),
-                  _StyledInputField(
-                    controller: _password,
-                    hintText: 'Password',
-                    icon: Icons.lock_outline,
-                    isPassword: true,
-                    accentColor: accentColor,
-                  ),
-                  const SizedBox(height: 24),
-                  _StyledButton(
-                    label: 'Login',
-                    isLoading: _isLoading,
-                    onPressed: _isLoading ? null : _handleLogin,
-                    color: accentColor,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Don't have an account? ",
-                        style: GoogleFonts.poppins(color: secondaryTextColor),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: backgroundGradient,
+        ),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.business_center_outlined,
+                        size: 64, color: accentColor),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Welcome Back',
+                      style: GoogleFonts.poppins(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTextColor,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CreateAccountScreen(
-                                authService: widget.authService,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Login to manage your business finances',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: secondaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    _StyledInputField(
+                      controller: _email,
+                      hintText: 'Email',
+                      icon: Icons.alternate_email,
+                      accentColor: accentColor,
+                    ),
+                    const SizedBox(height: 16),
+                    _StyledInputField(
+                      controller: _password,
+                      hintText: 'Password',
+                      icon: Icons.lock_outline,
+                      isPassword: true,
+                      accentColor: accentColor,
+                    ),
+                    const SizedBox(height: 24),
+                    _StyledButton(
+                      label: 'Login',
+                      isLoading: _isLoading,
+                      onPressed: _isLoading ? null : _handleLogin,
+                      color: accentColor,
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Don't have an account? ",
+                          style: GoogleFonts.poppins(color: secondaryTextColor),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => CreateAccountScreen(
+                                  authService: widget.authService,
+                                ),
                               ),
+                            );
+                          },
+                          child: Text(
+                            'Sign Up',
+                            style: GoogleFonts.poppins(
+                              color: accentColor,
+                              fontWeight: FontWeight.w600,
                             ),
-                          );
-                        },
-                        child: Text(
-                          'Sign Up',
-                          style: GoogleFonts.poppins(
-                            color: accentColor,
-                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -186,13 +195,13 @@ class _StyledInputField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-      style: GoogleFonts.poppins(color: Color(0xFF212529)),
+      style: GoogleFonts.poppins(color: const Color(0xFF212529)),
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: Colors.grey.shade500),
         hintText: hintText,
         hintStyle: GoogleFonts.poppins(color: Colors.grey.shade500),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white.withValues(alpha: 0.7),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 16,

@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:flowfin/api/exceptions.dart';
-import 'package:flowfin/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flowfin/services/auth.dart';
+import 'package:flowfin/api/exceptions.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   final AuthService authService;
@@ -59,7 +59,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       await widget.authService
           .register(_emailController.text, _passwordController.text)
           .then((_) {
-            _showMessage("You'll be redirected to Login in 3 seconds");
+            _showMessage("Account created! Redirecting to Login...");
             Timer(const Duration(seconds: 3), () {
               if (mounted) Navigator.pop(context);
             });
@@ -75,83 +75,90 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = Colors.deepPurple.shade300;
-    final backgroundColor = const Color(0xFFF8F9FA);
-    final primaryTextColor = const Color(0xFF212529);
-    final secondaryTextColor = Colors.grey.shade600;
+    final LinearGradient backgroundGradient = const LinearGradient(
+      colors: [Color(0xFFFDF6F9), Color(0xFFEAE1ED)],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    );
+
+    const Color accentColor = Color(0xFF8057A1);
+    const Color primaryTextColor = Color(0xFF1B1B1E);
+    const Color secondaryTextColor = Color(0xFF6E6E6E);
 
     return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.lock_outline, size: 64, color: primaryTextColor),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Create Account',
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: primaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Sign up to get started',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: secondaryTextColor,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  _StyledInputField(
-                    controller: _emailController,
-                    hintText: 'Email',
-                    icon: Icons.email_outlined,
-                    accentColor: accentColor,
-                  ),
-                  const SizedBox(height: 16),
-                  _StyledInputField(
-                    controller: _passwordController,
-                    hintText: 'Password',
-                    icon: Icons.lock_outline,
-                    isPassword: true,
-                    accentColor: accentColor,
-                  ),
-                  const SizedBox(height: 24),
-                  _StyledButton(
-                    label: 'Create Account',
-                    isLoading: _isLoading,
-                    onPressed: _isLoading ? null : _handleRegister,
-                    color: accentColor,
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Already have an account? ",
-                        style: GoogleFonts.poppins(color: secondaryTextColor),
+      body: Container(
+        decoration: BoxDecoration(gradient: backgroundGradient),
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.lock_outline, size: 64, color: accentColor),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Create Account',
+                      style: GoogleFonts.poppins(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: primaryTextColor,
                       ),
-                      GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Text(
-                          'Login',
-                          style: GoogleFonts.poppins(
-                            color: accentColor,
-                            fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Sign up to get started',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: secondaryTextColor,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    _StyledInputField(
+                      controller: _emailController,
+                      hintText: 'Email',
+                      icon: Icons.email_outlined,
+                      accentColor: accentColor,
+                    ),
+                    const SizedBox(height: 16),
+                    _StyledInputField(
+                      controller: _passwordController,
+                      hintText: 'Password',
+                      icon: Icons.lock_outline,
+                      isPassword: true,
+                      accentColor: accentColor,
+                    ),
+                    const SizedBox(height: 24),
+                    _StyledButton(
+                      label: 'Create Account',
+                      isLoading: _isLoading,
+                      onPressed: _isLoading ? null : _handleRegister,
+                      color: accentColor,
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Already have an account? ",
+                          style: GoogleFonts.poppins(color: secondaryTextColor),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(context),
+                          child: Text(
+                            'Login',
+                            style: GoogleFonts.poppins(
+                              color: accentColor,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -187,7 +194,7 @@ class _StyledInputField extends StatelessWidget {
         hintText: hintText,
         hintStyle: GoogleFonts.poppins(color: Colors.grey.shade500),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: Colors.white.withValues(alpha: 0.7),
         contentPadding: const EdgeInsets.symmetric(
           vertical: 18,
           horizontal: 16,

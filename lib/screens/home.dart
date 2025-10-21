@@ -1,472 +1,421 @@
-import 'package:flowfin/api/auth.dart';
-import 'package:flowfin/api/models/chain.dart';
-import 'package:flowfin/api/models/user.dart';
-import 'package:flowfin/screens/auth/login.dart';
-import 'package:flowfin/services/auth.dart';
-import 'package:cryptofont/cryptofont.dart';
+import 'package:flowfin/screens/history.dart';
+import 'package:flowfin/screens/invoice_full.dart';
+import 'package:flowfin/screens/leaderboard.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:recase/recase.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flowfin/api/models/user.dart';
+import 'package:flowfin/services/auth.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomePage extends StatelessWidget {
   final AuthService authService;
   final User user;
-  const HomeScreen({super.key, required this.authService, required this.user});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-
-  late AnimationController _animationController;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _searchController.addListener(() {
-      setState(() {
-        _searchQuery = _searchController.text.trim().toLowerCase();
-      });
-    });
-
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 8),
-    );
-
-    _animationController.forward();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _animationController.dispose();
-    super.dispose();
-  }
+  const HomePage({super.key, required this.authService, required this.user});
 
   @override
   Widget build(BuildContext context) {
-    final backgroundGradient = [
-      const Color(0xFF2D1B4E),
-      const Color(0xFF1A102F),
-      const Color.fromARGB(255, 11, 10, 15),
-      const Color.fromARGB(255, 17, 13, 27),
-      Colors.black,
+    final surfaceColor = Colors.white.withValues(alpha: 0.6);
+    const accentColor = Color(0xFFa188a6);
+    const accentDark = Color(0xFF4E46B4);
+    const textPrimary = Color(0xFF1A1B1E);
+    const textSecondary = Color(0xFF6D6D6D);
+
+    final topInvoices = [
+      {
+        "buyer": "ABC Textiles",
+        "amount": "₹1,00,000",
+        "status": "Open for Funding",
+        "due": "15 days",
+        "trust": "4.8",
+      },
+      {
+        "buyer": "XYZ Apparel",
+        "amount": "₹50,000",
+        "status": "60% Funded",
+        "due": "20 days",
+        "trust": "4.5",
+      },
+      {
+        "buyer": "LMN Clothing",
+        "amount": "₹1,20,000",
+        "status": "Fully Funded",
+        "due": "5 days",
+        "trust": "4.9",
+      },
     ];
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: backgroundGradient,
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+    final popularInvoices = [
+      {
+        "buyer": "PQR Garments",
+        "amount": "₹75,000",
+        "days": "10 days",
+        "risk": "Medium Risk",
+      },
+      {
+        "buyer": "QWE Exports",
+        "amount": "₹60,000",
+        "days": "7 days",
+        "risk": "Low Risk",
+      },
+      {
+        "buyer": "RST Weaves",
+        "amount": "₹90,000",
+        "days": "5 days",
+        "risk": "High Risk",
+      },
+    ];
+    final List gridItems = [
+      {"title": "Call", "icon": Icons.call},
+      {"title": "Score", "icon": Icons.leaderboard},
+      {"title": "Scanner", "icon": Icons.qr_code_scanner},
+      {"title": "History", "icon": Icons.history},
+    ];
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Good Afternoon, Rakesh!",
+                  style: GoogleFonts.poppins(
+                    color: textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                CircleAvatar(
+                  backgroundColor: accentColor.withValues(alpha: 0.1),
+                  radius: 18,
+                  child: const Icon(Icons.person),
+                ),
+              ],
+            ),
           ),
-        ),
-        // child: SafeArea(
-        //   bottom: false,
-        //   child: FutureBuilder<List<ChainHeader>>(
-        //     future: ChainsAPI().getChains(),
-        //     builder: (context, snapshot) {
-        //       if (!snapshot.hasData) {
-        //         return Center(
-        //           child: CircularProgressIndicator(
-        //             strokeWidth: 8,
-        //             color: const Color(0xFF6A11CB),
-        //             strokeCap: StrokeCap.round,
-        //           ),
-        //         );
-        //       } else {
-        //         final chainsHeaders = snapshot.data!;
-        //         final filteredHeaders = chainsHeaders.where((header) {
-        //           final headerMatch = header.title.toLowerCase().contains(
-        //             _searchQuery,
-        //           );
-        //           final chainMatch = header.chains.any(
-        //             (chain) =>
-        //                 chain.cId.toLowerCase().contains(_searchQuery) ||
-        //                 chain.name.toLowerCase().contains(_searchQuery) ||
-        //                 chain.iconName.toLowerCase().contains(_searchQuery),
-        //           );
-        //           return _searchQuery.isEmpty || headerMatch || chainMatch;
-        //         }).toList();
 
-        //         return Column(
-        //           children: [
-        //             Padding(
-        //               padding: const EdgeInsets.only(
-        //                 left: 16,
-        //                 right: 16,
-        //                 bottom: 16,
-        //                 top: 0,
-        //               ),
-        //               child: Row(
-        //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //                 children: [
-        //                   Container(
-        //                     height: 42,
-        //                     width: MediaQuery.of(context).size.width * 0.78,
-        //                     decoration: BoxDecoration(
-        //                       color: Colors.white.withValues(alpha: 0.08),
-        //                       borderRadius: BorderRadius.circular(16),
-        //                       boxShadow: [
-        //                         BoxShadow(
-        //                           color: Colors.black.withValues(alpha: 0.25),
-        //                           blurRadius: 8,
-        //                           offset: const Offset(0, 4),
-        //                         ),
-        //                       ],
-        //                     ),
-        //                     padding: const EdgeInsets.symmetric(horizontal: 16),
-        //                     alignment: Alignment.center,
-        //                     child: TextField(
-        //                       controller: _searchController,
-        //                       style: const TextStyle(
-        //                         color: Colors.white,
-        //                         fontSize: 16,
-        //                       ),
-        //                       decoration: InputDecoration(
-        //                         hintText: 'Search headers and chains...',
-        //                         hintStyle: const TextStyle(
-        //                           color: Colors.white54,
-        //                         ),
-        //                         border: InputBorder.none,
-        //                         isDense: true,
-        //                         icon: Icon(
-        //                           Icons.search,
-        //                           color: Colors.white.withValues(alpha: 0.5),
-        //                         ),
-        //                       ),
-        //                       cursorColor: Colors.white,
-        //                     ),
-        //                   ),
-        //                   PopupMenuButton<String>(
-        //                     color: Color(0xFF2D1B4E).withValues(alpha: 1),
-        //                     shape: RoundedRectangleBorder(
-        //                       borderRadius: BorderRadius.circular(12),
-        //                     ),
+          const SizedBox(height: 18),
 
-        //                     menuPadding: EdgeInsets.only(),
-        //                     padding: EdgeInsetsGeometry.all(0),
-        //                     icon: CircleAvatar(
-        //                       backgroundColor: Colors.white.withValues(
-        //                         alpha: 0.08,
-        //                       ),
-        //                       child: Icon(
-        //                         Icons.person,
-        //                         color: Colors.white.withValues(alpha: 0.5),
-        //                       ),
-        //                     ),
-        //                     onSelected: (value) async {
-        //                       if (value == 'api_keys') {
-        //                         Navigator.push(
-        //                           context,
-        //                           MaterialPageRoute(
-        //                             builder: (context) {
-        //                               return APIKeysScreen(user: widget.user);
-        //                             },
-        //                           ),
-        //                         );
-        //                       } else if (value == 'logout') {
-        //                         await AuthAPI().logout(
-        //                           widget.user.refreshToken!,
-        //                           widget.user.accessToken!,
-        //                         );
-        //                         if (context.mounted) {
-        //                           Navigator.pushReplacement(
-        //                             context,
-        //                             MaterialPageRoute(
-        //                               builder: (context) {
-        //                                 return LoginScreen(
-        //                                   authService: widget.authService,
-        //                                 );
-        //                               },
-        //                             ),
-        //                           );
-        //                         }
-        //                       }
-        //                     },
-        //                     itemBuilder: (context) => [
-        //                       PopupMenuItem(
-        //                         value: 'api_keys',
-        //                         child: Row(
-        //                           mainAxisSize: MainAxisSize.min,
-        //                           children: [
-        //                             Icon(Icons.key, color: Colors.white),
-        //                             SizedBox(width: 8),
-        //                             Text(
-        //                               "API Keys",
-        //                               style: TextStyle(
-        //                                 color: Colors.white.withValues(
-        //                                   alpha: 0.9,
-        //                                 ),
-        //                                 fontWeight: FontWeight.bold,
-        //                                 letterSpacing: 1.05,
-        //                               ),
-        //                             ),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                       PopupMenuItem(
-        //                         value: 'logout',
-        //                         child: Row(
-        //                           mainAxisSize: MainAxisSize.min,
-        //                           children: [
-        //                             Icon(Icons.logout, color: Colors.white),
-        //                             SizedBox(width: 8),
-        //                             Text(
-        //                               "Logout",
-        //                               style: TextStyle(
-        //                                 color: Colors.white.withValues(
-        //                                   alpha: 0.9,
-        //                                 ),
-        //                                 fontWeight: FontWeight.bold,
-        //                                 letterSpacing: 1.05,
-        //                               ),
-        //                             ),
-        //                           ],
-        //                         ),
-        //                       ),
-        //                     ],
-        //                   ),
-        //                 ],
-        //               ),
-        //             ),
-
-        //             Expanded(
-        //               child: ShaderMask(
-        //                 shaderCallback: (rect) {
-        //                   return LinearGradient(
-        //                     begin: Alignment.topCenter,
-        //                     end: Alignment.bottomCenter,
-        //                     colors: [
-        //                       Colors.transparent,
-        //                       Colors.deepPurple.shade800,
-        //                       Colors.black,
-        //                       Colors.transparent,
-        //                     ],
-        //                     stops: const [0.0, 0.01, 0.95, 1.0],
-        //                   ).createShader(rect);
-        //                 },
-        //                 blendMode: BlendMode.dstIn,
-        //                 child: ListView.builder(
-        //                   padding: const EdgeInsets.symmetric(horizontal: 16),
-        //                   itemCount: filteredHeaders.length,
-        //                   itemBuilder: (context, index) {
-        //                     final header = filteredHeaders[index];
-        //                     final filteredChains = _searchQuery.isEmpty
-        //                         ? header.chains
-        //                         : header.chains
-        //                               .where(
-        //                                 (chain) => chain.name
-        //                                     .toLowerCase()
-        //                                     .contains(_searchQuery),
-        //                               )
-        //                               .toList();
-
-        //                     if (filteredChains.isEmpty &&
-        //                         _searchQuery.isNotEmpty) {
-        //                       return const SizedBox.shrink();
-        //                     }
-
-        //                     final double headerStart =
-        //                         index / filteredHeaders.length;
-        //                     final double headerEnd =
-        //                         (index + 1) / filteredHeaders.length;
-
-        //                     final headerAnimation = CurvedAnimation(
-        //                       parent: _animationController,
-        //                       curve: Interval(
-        //                         headerStart,
-        //                         headerEnd,
-        //                         curve: Curves.easeOut,
-        //                       ),
-        //                     );
-
-        //                     return FadeTransition(
-        //                       opacity: headerAnimation,
-        //                       child: Column(
-        //                         crossAxisAlignment: CrossAxisAlignment.start,
-        //                         children: [
-        //                           Padding(
-        //                             padding: EdgeInsets.only(
-        //                               bottom: 12,
-        //                               top: 8,
-        //                             ),
-        //                             child: Row(
-        //                               children: [
-        //                                 Icon(
-        //                                   Icons.category,
-        //                                   color: Colors.white.withValues(
-        //                                     alpha: 0.85,
-        //                                   ),
-        //                                   size: 20,
-        //                                 ),
-        //                                 const SizedBox(width: 8),
-        //                                 Text(
-        //                                   header.title,
-        //                                   style: TextStyle(
-        //                                     color: Colors.white.withValues(
-        //                                       alpha: 0.9,
-        //                                     ),
-        //                                     fontSize: 22,
-        //                                     fontWeight: FontWeight.bold,
-        //                                     letterSpacing: 1.05,
-        //                                   ),
-        //                                 ),
-        //                               ],
-        //                             ),
-        //                           ),
-
-        //                           GridView.builder(
-        //                             physics:
-        //                                 const NeverScrollableScrollPhysics(),
-        //                             shrinkWrap: true,
-        //                             itemCount: filteredChains.length,
-        //                             padding: const EdgeInsets.only(bottom: 8),
-        //                             gridDelegate:
-        //                                 const SliverGridDelegateWithFixedCrossAxisCount(
-        //                                   crossAxisCount: 3,
-        //                                   crossAxisSpacing: 12,
-        //                                   mainAxisSpacing: 12,
-        //                                   childAspectRatio: 1,
-        //                                 ),
-        //                             itemBuilder: (context, chainIndex) {
-        //                               final chain = filteredChains[chainIndex];
-
-        //                               final double itemStart =
-        //                                   headerStart +
-        //                                   (headerEnd - headerStart) *
-        //                                       (chainIndex /
-        //                                           filteredChains.length);
-        //                               final double itemEnd =
-        //                                   headerStart +
-        //                                   (headerEnd - headerStart) *
-        //                                       ((chainIndex + 1) /
-        //                                           filteredChains.length);
-
-        //                               final itemAnimation = CurvedAnimation(
-        //                                 parent: _animationController,
-        //                                 curve: Interval(
-        //                                   itemStart.clamp(0.0, 1.0),
-        //                                   itemEnd.clamp(0.0, 1.0),
-        //                                   curve: Curves.easeOut,
-        //                                 ),
-        //                               );
-
-        //                               return FadeTransition(
-        //                                 opacity: itemAnimation,
-        //                                 child: SlideTransition(
-        //                                   position: Tween<Offset>(
-        //                                     begin: const Offset(0, 0.2),
-        //                                     end: Offset.zero,
-        //                                   ).animate(itemAnimation),
-        //                                   child: GestureDetector(
-        //                                     onTap: () {
-        //                                       Navigator.push(
-        //                                         context,
-        //                                         MaterialPageRoute(
-        //                                           builder: (context) {
-        //                                             return WalletsScreen(
-        //                                               authService:
-        //                                                   widget.authService,
-        //                                               chain: chain,
-        //                                               user: widget.user,
-        //                                             );
-        //                                           },
-        //                                         ),
-        //                                       );
-        //                                     },
-        //                                     child: Container(
-        //                                       height: 128,
-        //                                       decoration: BoxDecoration(
-        //                                         gradient: LinearGradient(
-        //                                           colors: [
-        //                                             Colors.white.withValues(
-        //                                               alpha: 0.05,
-        //                                             ),
-        //                                             Colors.white.withValues(
-        //                                               alpha: 0.02,
-        //                                             ),
-        //                                           ],
-        //                                           begin: Alignment.topLeft,
-        //                                           end: Alignment.bottomRight,
-        //                                         ),
-        //                                         borderRadius:
-        //                                             BorderRadius.circular(18),
-        //                                         border: Border.all(
-        //                                           color: Colors.white
-        //                                               .withValues(alpha: 0.06),
-        //                                           width: 1,
-        //                                         ),
-        //                                         boxShadow: [
-        //                                           BoxShadow(
-        //                                             color: Colors.black
-        //                                                 .withValues(
-        //                                                   alpha: 0.15,
-        //                                                 ),
-        //                                             blurRadius: 12,
-        //                                             offset: const Offset(0, 6),
-        //                                           ),
-        //                                         ],
-        //                                       ),
-        //                                       padding: const EdgeInsets.all(14),
-        //                                       alignment: Alignment.center,
-        //                                       child: Column(
-        //                                         mainAxisAlignment:
-        //                                             MainAxisAlignment
-        //                                                 .spaceEvenly,
-        //                                         children: [
-        //                                           Icon(
-        //                                             CryptoFontIcons.fromSymbol(
-        //                                                   chain.iconName,
-        //                                                 ) ??
-        //                                                 Icons.diamond,
-        //                                             color: Colors.white,
-        //                                             size: 30,
-        //                                           ),
-        //                                           Text(
-        //                                             ReCase(
-        //                                               chain.name,
-        //                                             ).titleCase,
-        //                                             maxLines: 2,
-        //                                             textAlign: TextAlign.center,
-        //                                             overflow:
-        //                                                 TextOverflow.ellipsis,
-        //                                             style: GoogleFonts.inter(
-        //                                               color: Colors.white,
-        //                                               fontSize: 15,
-        //                                             ),
-        //                                           ),
-        //                                         ],
-        //                                       ),
-        //                                     ),
-        //                                   ),
-        //                                 ),
-        //                               );
-        //                             },
-        //                           ),
-
-        //                           const SizedBox(height: 12),
-        //                         ],
-        //                       ),
-        //                     );
-        //                   },
-        //                 ),
-        //               ),
-        //             ),
-        //           ],
-        //         );
-        //       }
-        //     },
-        //   ),
-        // ),
+          CarouselSlider(
+            items: topInvoices.map((invoice) {
+              return Builder(
+                builder: (BuildContext context) {
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => InvoiceDetailPage()),
+                      );
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: surfaceColor,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.07),
+                            blurRadius: 20,
+                            spreadRadius: 2,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  invoice["buyer"]!,
+                                  style: GoogleFonts.poppins(
+                                    color: textPrimary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.business_rounded,
+                                  color: accentColor,
+                                  size: 22,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Amount",
+                                    style: GoogleFonts.poppins(
+                                      color: textSecondary,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    invoice["amount"]!,
+                                    style: GoogleFonts.poppins(
+                                      color: accentColor,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    "Due in",
+                                    style: GoogleFonts.poppins(
+                                      color: textSecondary,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    invoice["due"]!,
+                                    style: GoogleFonts.poppins(
+                                      color: textPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: accentColor.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  invoice["status"]!,
+                                  style: GoogleFonts.poppins(
+                                    color: accentDark,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star_rounded,
+                                    color: textSecondary,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    invoice["rating"] ?? "4.5",
+                                    style: GoogleFonts.poppins(
+                                      color: textPrimary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }).toList(),
+            options: CarouselOptions(
+              height: 190,
+              clipBehavior: Clip.none,
+              aspectRatio: 16 / 9,
+              viewportFraction: 0.95,
+              enableInfiniteScroll: true,
+              autoPlay: true,
+              autoPlayInterval: const Duration(seconds: 15),
+              autoPlayAnimationDuration: const Duration(milliseconds: 1500),
+              autoPlayCurve: Curves.fastOutSlowIn,
+              enlargeCenterPage: true,
+              enlargeFactor: 0.25,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisCount: 4,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1,
+                children: List.generate(4, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      if (index == 3) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => HistoryPage()),
+                        );
+                      }
+                      if (index == 1) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => LeaderboardPage()),
+                        );
+                      }
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: accentColor.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(gridItems[index]["icon"]),
+                          Text(
+                            gridItems[index]["title"],
+                            style: const TextStyle(fontWeight: FontWeight.w400),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Popular Invoices",
+                  style: GoogleFonts.poppins(
+                    color: textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    "View All",
+                    style: GoogleFonts.poppins(
+                      color: textSecondary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: popularInvoices.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            itemBuilder: (context, index) {
+              final invoice = popularInvoices[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => InvoiceDetailPage()),
+                  );
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ListTile(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 6,
+                    ),
+                    title: Text(
+                      invoice["buyer"]!,
+                      style: GoogleFonts.poppins(
+                        color: textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "${invoice["days"]} • ${invoice["risk"]}",
+                      style: GoogleFonts.poppins(
+                        color: textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                    trailing: Text(
+                      invoice["amount"]!,
+                      style: GoogleFonts.poppins(
+                        color: accentColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    onTap: () {},
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 20),
+        ],
       ),
     );
   }
